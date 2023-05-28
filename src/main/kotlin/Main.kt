@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import parser.Parser
+import utils.TableType
 import java.io.File
 import javax.swing.JFileChooser
 
@@ -195,29 +196,22 @@ private fun renderTextButtonGroupField(
 private fun tableType(placeholder: String) = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
     var currentJsonDataFileName by remember { mutableStateOf("") }
 
-    val items = listOf(
-                    "A",
-                    "B",
-                    "C",
-                    "D"
-    )
-
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-        Text(items[selectedIndex],modifier = Modifier.fillMaxWidth().clickable(onClick = { expanded = true }))
+        Text(TableType.values()[selectedIndex].stringName, modifier = Modifier.fillMaxWidth().clickable(onClick = { expanded = true }))
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded },
             modifier = Modifier.fillMaxWidth()
         ) {
-            items.forEachIndexed { index, s ->
+            TableType.values().forEachIndexed { index, s ->
                 DropdownMenuItem(onClick = {
                     selectedIndex = index
                     expanded = false
                 }) {
-                    Text(text = s)
+                    Text(text = s.stringName)
                 }
             }
         }
