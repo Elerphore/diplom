@@ -1,3 +1,5 @@
+package state
+
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource
 import data.Order
 import data.Student
@@ -28,9 +30,19 @@ object DatabaseSource {
         statement = connection!!.createStatement()
     }
 
+    fun groupNames(): List<String> =
+        executeQuery("select distinct(NameGr) from vStuds") { res ->
+            res.getString("NameGr")
+        }
+
+    fun orderTypes(): List<String> =
+        executeQuery("select distinct(Name_Prikaz) from vStudPrikaz") { res ->
+            res.getString("Name_Prikaz")
+        }
+
     fun orders(): List<Order> =
         executeQuery("select Pers_Kod, Kod_aGr, Name_Prikaz, Nom_Prikaz, Date_Prikaz from vStudPrikaz") { result ->
-            return@executeQuery Order(
+            Order(
                 persKod = result.getInt("Pers_Kod"),
                 kodaGr = result.getInt("Kod_aGr"),
                 namePrikaz = result.getString("Name_Prikaz"),
@@ -41,7 +53,7 @@ object DatabaseSource {
 
     fun students(): List<Student> =
         executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from vStuds") { result ->
-            return@executeQuery Student(
+            Student(
                 persKod = result.getInt("Pers_Kod"),
                 kodAgr = result.getInt("Kod_aGr"),
                 Sex = result.getString("Sex"),

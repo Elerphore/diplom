@@ -12,18 +12,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import parser.Parser
+import state.ApplicationState
 import utils.TableType
 import java.io.File
-import javax.swing.JFileChooser
 
 fun main() = application {
 
-    CoroutineScope(Dispatchers.IO).launch {
-        println(DatabaseSource.students())
-        println(DatabaseSource.orders())
+    CoroutineScope(IO).launch {
+        ApplicationState.init()
     }
 
     Window(title = "Отчётная система МПК", onCloseRequest = ::exitApplication) {
@@ -36,8 +35,6 @@ fun main() = application {
 @Composable
 fun renderMain() {
     var dataFile by remember { mutableStateOf(File("")) }
-    val onDataFileChange: (File) -> Unit = { file -> dataFile = file }
-    val chooser by remember { mutableStateOf(JFileChooser()) }
     var showReport by remember { mutableStateOf(false) }
     val onChangeReport: (Boolean) -> Unit = { showReport = it }
 
@@ -51,9 +48,7 @@ fun renderMain() {
     ) {
         renderMainInputs(
             showReport = showReport,
-            chooser = chooser,
             onChangeReport = onChangeReport,
-            onDataFileChange = onDataFileChange
         )
 
         if (showReport) { renderReport(text, onChangeText) }
@@ -75,7 +70,8 @@ private fun typeReportSelectable(placeholder: String, onTextFieldChange: (String
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
         var expanded by remember { mutableStateOf(false) }
 
-        val options = listOf("Зачисление", "Отчисление", "Академический отпуск")
+//        val options = DatabaseSource.orderTypes()
+        val options = listOf<String>()
 
         TextField(
             label = { Text("Тип приказа") },
@@ -106,7 +102,11 @@ fun groupReportSelectable(groupName: String, onGroupNameChange: (String) -> Unit
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
         var expanded by remember { mutableStateOf(false) }
 
-        val options = listOf("ИСп-19-1", "ИСп-19-2", "ИСп-19-3", "ИСп-19-4")
+        var options by remember { mutableStateOf(listOf<String?>()) }
+
+//        CoroutineScope(IO).launch {
+            options = ApplicationState.groupNames
+//        }
 
         TextField(
             label = { Text("Группа") },
@@ -121,11 +121,13 @@ fun groupReportSelectable(groupName: String, onGroupNameChange: (String) -> Unit
             expanded = expanded,
             onDismissRequest = { expanded = false },
             content = {
-                options.forEachIndexed { index, s ->
-                    DropdownMenuItem(
-                        content = { Text(s) },
-                        onClick = { onGroupNameChange(options[index]) }
-                    )
+                if(options.isNotEmpty()) {
+                    options.forEachIndexed { index, s ->
+                        DropdownMenuItem(
+                            content = { Text(s!!) },
+                            onClick = { onGroupNameChange(options[index]!!) }
+                        )
+                    }
                 }
             }
         )
@@ -145,57 +147,19 @@ fun studentNameField(studentName: String, onStudentNameChange: (String) -> Unit)
         )
     }
 
-
-@Composable
-private fun renderChooserButton(chooser: JFileChooser, onDataFileChange: (File) -> Unit, onValueChange: (String) -> Unit, ) =
-    Button(modifier = Modifier.fillMaxWidth().fillMaxWidth(0.4F),
-        onClick = {
-            chooser.apply {
-                val state = showSaveDialog(null)
-                onDataFileChange(this.selectedFile)
-                this.selectedFile.let { onValueChange(it.name) }
-            }
-        }) { Text("Выбрать файл") }
-
 @Composable
 private fun renderMainInputs(
     showReport: Boolean,
-    chooser: JFileChooser,
     onChangeReport: (Boolean) -> Unit,
-    onDataFileChange: (File) -> Unit,
 ) = Column(Modifier.fillMaxWidth().padding(top = 30.dp), Arrangement.spacedBy(10.dp), Alignment.CenterHorizontally) {
-        renderTextButtonGroupField("Текущие данные", chooser, onDataFileChange)
-        renderTextButtonGroupField("Прошлая таблица", chooser, onDataFileChange)
-
-        tableType("zhopa")
+        tableType()
 
         renderCheckboxField(showReport, onChangeReport)
     }
 
-@Composable
-private fun renderTextButtonGroupField(
-    placeholder: String,
-    chooser: JFileChooser,
-    onDataFileChange: (File) -> Unit,
-) = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
-    var currentJsonDataFileName by remember { mutableStateOf("") }
-
-    TextField(
-        label = { Text(placeholder) },
-        modifier = Modifier.fillMaxWidth(0.6F),
-        value = currentJsonDataFileName,
-        readOnly = true,
-        onValueChange = { },
-        singleLine = true
-    )
-
-    renderChooserButton(chooser, onDataFileChange) { currentJsonDataFileName = it }
-}
 
 @Composable
-private fun tableType(placeholder: String) = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
-    var currentJsonDataFileName by remember { mutableStateOf("") }
-
+private fun tableType() = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf(0) }
 
