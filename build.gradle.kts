@@ -26,7 +26,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-//    implementation("com.microsoft.sqlserver:mssql-jdbc:12.2.0.jre11")
     implementation("com.microsoft.sqlserver:mssql-jdbc:8.2.1.jre11")
 }
 
