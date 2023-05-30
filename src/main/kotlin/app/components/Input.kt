@@ -12,10 +12,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun renderReport(
-    text: String,
-    onTextFieldChange: (String) -> Unit,
-) {
+fun renderReport(text: String, onTextFieldChange: (String) -> Unit) {
     var reportCount by remember { mutableStateOf(2) }
 
     Text("Количество приказов: $reportCount")
@@ -41,22 +38,20 @@ fun renderReport(
     Button(
         onClick = { reportCount++; },
         modifier = Modifier.fillMaxWidth(0.9f)
-    ) {
-        Text("Добавить приказ")
-    }
+    ) { Text("Добавить приказ") }
 
     Button(
         onClick = { if (reportCount > 1) reportCount--; },
         modifier = Modifier.fillMaxWidth(0.9f)
-    ) {
-        Text("Убрать приказ")
-    }
+    ) { Text("Убрать приказ") }
 }
 
 @Composable
 fun studentNameField(studentName: String, onStudentNameChange: (String) -> Unit) =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
+
         var expanded by remember { mutableStateOf(false) }
+
         TextField(
             label = { Text("Ф.И.О Студента") },
             modifier = Modifier.fillMaxWidth().onFocusChanged { expanded = it.hasFocus },

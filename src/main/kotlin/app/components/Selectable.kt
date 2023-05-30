@@ -68,21 +68,24 @@ fun typeReportSelectable(placeholder: String, onTextFieldChange: (String) -> Uni
 
 @Composable
 fun tableType() = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
+
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-        Text(
-            TableType.values()[selectedIndex].stringName,
-            modifier = Modifier.fillMaxWidth().clickable(onClick = { expanded = true })
-        )
+
+        Text(TableType.values()[selectedIndex].stringName, modifier = Modifier.fillMaxWidth().clickable(onClick = { expanded = true }))
+
         DropdownMenu(
             expanded = expanded, onDismissRequest = { expanded }, modifier = Modifier.fillMaxWidth()
         ) {
             TableType.values().forEachIndexed { index, s ->
                 DropdownMenuItem(onClick = {
+
                     selectedIndex = index
                     expanded = false
+                    ApplicationState.selectedType = TableType.values()[selectedIndex]
+
                 }) {
                     Text(text = s.stringName)
                 }

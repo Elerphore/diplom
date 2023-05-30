@@ -9,13 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import parser.Parser
-import java.io.File
+import generator.generateTable
 
 @Composable
-fun renderButton(dataFile: File) =
+fun button() =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
-        Button(modifier = Modifier.fillMaxWidth(1.0F), onClick = { Parser.renderExcelFile(dataFile) }) {
+        Button(
+            modifier = Modifier.fillMaxWidth(1.0F),
+            onClick = { generateTable() }
+        ) {
             Text("Сгенерировать файл")
         }
     }
