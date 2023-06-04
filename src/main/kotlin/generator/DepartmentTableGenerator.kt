@@ -115,21 +115,17 @@ class DepartmentTableGenerator() : TableTypeInterface {
                 lastCol = (prevGRAmount * 2) + ((previousGroupsAmount * 2)) + 3,
             )
 
-            studgrp.groupByOsnova()["Бюджетная"]?.let {
-                information(
-                    it,
-                    false,
-                    previousGroupsAmount + prevGRAmount
-                )
-            }
+            information(
+                studgrp.groupByOsnova()["Бюджетная"] ?: emptyList(),
+                false,
+                (previousGroupsAmount * 2) + (prevGRAmount * 2)
+            )
 
-            studgrp.groupByOsnova()["Коммерческая"]?.let {
-                information(
-                    it,
-                    true,
-                    previousGroupsAmount + prevGRAmount
-                )
-            }
+            information(
+                studgrp.groupByOsnova()["Коммерческая"] ?: emptyList(),
+                true,
+                (previousGroupsAmount * 2) + (prevGRAmount * 2)
+            )
 
             prevGRAmount += 1
         }
@@ -170,7 +166,7 @@ class DepartmentTableGenerator() : TableTypeInterface {
 
 
     private fun evaluateValue(type: String, stds: List<Student>): Int =
-        when(type) {
+        when (type) {
             "Количество групп" -> 0
             "Кол-во несовершн.студент." -> stds.count { it.age < 18 }
             "Кол-во юношей" -> stds.count { it.Sex == "м" }
@@ -199,7 +195,7 @@ class DepartmentTableGenerator() : TableTypeInterface {
         }
 
     private fun information(studgrp: List<Student>, osnova: Boolean, i: Int) {
-        val diff = if(osnova) 1 else 0
+        val diff = if (osnova) 1 else 0
 
         titles.forEachIndexed { index, s ->
             val value = evaluateValue(s, studgrp)
