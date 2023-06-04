@@ -35,6 +35,11 @@ object DatabaseSource {
             res.getString("NameGr")
         }
 
+    fun departNames(): List<String> =
+        executeQuery("select distinct(Depart) from vStuds") { res ->
+            res.getString("Depart")
+        }
+
     fun orderTypes(): List<String> =
         executeQuery("select distinct(Name_Prikaz) from vStudPrikaz") { res ->
             res.getString("Name_Prikaz")
@@ -53,6 +58,25 @@ object DatabaseSource {
 
     fun students(): List<Student> =
         executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from vStuds") { result ->
+            Student(
+                persKod = result.getInt("Pers_Kod"),
+                kodAgr = result.getInt("Kod_aGr"),
+                Sex = result.getString("Sex"),
+                osnova = result.getString("osnova"),
+                codeSpec = result.getString("codeSpec"),
+                nameSpec = result.getString("Name_Spec"),
+                isActive = result.getBoolean("isActive"),
+                age = result.getInt("Age"),
+                depart = result.getString("Depart"),
+                nameGr = result.getString("NameGr"),
+                nameFormO = result.getString("Name_FormO"),
+                datePrikazFirst = result.getDate("datePrikazFirst"),
+                dateEndOb = result.getDate("Date_EndOb")
+            )
+        }
+
+    fun studentsFromDepartment(department: String): List<Student> =
+        executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from vStuds where Depart = '$department'") { result ->
             Student(
                 persKod = result.getInt("Pers_Kod"),
                 kodAgr = result.getInt("Kod_aGr"),
