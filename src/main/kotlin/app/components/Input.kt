@@ -12,6 +12,22 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 
 @Composable
+fun input(label: String) =
+    Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
+
+        var expanded by remember { mutableStateOf(false) }
+
+        TextField(
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth().onFocusChanged { expanded = it.hasFocus },
+            value = "",
+            onValueChange = { },
+            singleLine = true,
+        )
+    }
+
+
+@Composable
 fun renderReport(text: String, onTextFieldChange: (String) -> Unit) {
     var reportCount by remember { mutableStateOf(2) }
 

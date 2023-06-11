@@ -12,12 +12,12 @@ import androidx.compose.ui.unit.dp
 import generator.generateTable
 
 @Composable
-fun button() =
+fun button(label: String) =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
         Button(
             modifier = Modifier.fillMaxWidth(1.0F),
             onClick = { generateTable() }
         ) {
-            Text("Сгенерировать файл")
+            Text(label)
         }
     }

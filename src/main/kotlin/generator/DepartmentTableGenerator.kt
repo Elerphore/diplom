@@ -14,7 +14,7 @@ class DepartmentTableGenerator() : TableTypeInterface {
     override val fact: XSSFWorkbook = XSSFWorkbook()
     override var sheet: XSSFSheet? = null
     override val styles = CellStyler(fact)
-    override val excelFile = File("${System.getProperty("user.dir")}/form_one.xlsx")
+    override val excelFile = File("${System.getProperty("user.dir")}/out/department.xlsx")
     override var lastRowTable: Int = 0
 
     private val students = ApplicationState.students

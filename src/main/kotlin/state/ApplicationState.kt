@@ -1,6 +1,7 @@
 package state
 
 import data.Student
+import utils.ScreenType
 import utils.TableType
 
 object ApplicationState {
@@ -11,6 +12,8 @@ object ApplicationState {
     var departments: List<String> = emptyList()
 
     var students: List<Student> = emptyList()
+
+    var screen: ScreenType = ScreenType.AUTHORIZATION
 
     init {
         groupNames = DatabaseSource.groupNames()
