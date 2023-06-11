@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.components.button
 import app.components.input
-import app.components.tableType
 
 class AuthScreen : ScreenInterface {
     @Composable
