@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.components.button
 import app.components.tableType
+import generator.generateTable
 
 class MainScreen: ScreenInterface {
     @Composable
@@ -22,6 +23,9 @@ class MainScreen: ScreenInterface {
             Alignment.CenterHorizontally
         ) {
             tableType()
-            button("Сгенерировать файл")
+
+            button("Сгенерировать файл") {
+                generateTable()
+            }
         }
 }

@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.dp
 import generator.generateTable
 
 @Composable
-fun button(label: String) =
+fun button(label: String, onClick: () -> Unit) =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
         Button(
             modifier = Modifier.fillMaxWidth(1.0F),
-            onClick = { generateTable() }
+            onClick = { onClick() }
         ) {
             Text(label)
         }

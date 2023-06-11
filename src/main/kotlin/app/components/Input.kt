@@ -12,7 +12,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun input(label: String) =
+fun input(label: String, value: String, onValueChange: (value: String) -> Unit, ) =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
 
         var expanded by remember { mutableStateOf(false) }
@@ -20,8 +20,8 @@ fun input(label: String) =
         TextField(
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth().onFocusChanged { expanded = it.hasFocus },
-            value = "",
-            onValueChange = { },
+            value = value,
+            onValueChange = { onValueChange(it) },
             singleLine = true,
         )
     }
