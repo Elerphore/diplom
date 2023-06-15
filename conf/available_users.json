@@ -1,16 +1,24 @@
 {
   "users": [
     {
-      "name": "NAME_ONE",
-      "password": "PASSWORD_ONE"
+      "name": "Бирюкова Ю.Ю",
+      "password": "Бирюкова",
+      "department": "Отд. 1 Общеобразовательная подготовка"
     },
     {
-      "name": "NAME_SECOND",
-      "password": "PASSWORD_SECOND"
+      "name": "Сидорова Н.В",
+      "password": "Сидорова",
+      "department": "Отд. 2 Информационные технологии и транспорт"
     },
     {
-      "name": "NAME_THIRD",
-      "password": "PASSWORD_THIRD"
+      "name": "Науменко О.П",
+      "password": "Науменко",
+      "department": "Отд. 3 Механическое, гидравлическое оборудование и металлургия"
+    },
+    {
+      "name": "Закирова Л.А",
+      "password": "Закирова",
+      "department": "Отд. 4 Строительство, экономика и сфера обслуживания"
     }
   ]
 }

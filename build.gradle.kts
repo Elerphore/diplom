@@ -26,7 +26,8 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    implementation("com.microsoft.sqlserver:mssql-jdbc:8.2.1.jre11")
+
+    implementation("org.postgresql:postgresql:42.6.0")
 }
 
 tasks.test {
@@ -34,7 +35,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "15"
 }
 
 compose.desktop {
@@ -44,6 +45,12 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "magtu-parser-ed"
             packageVersion = "1.0.0"
+
+            modules("java.sql")
+            modules("java.management")
+            modules("java.security.sasl")
+
+            includeAllModules = true
         }
     }
 }

@@ -86,9 +86,7 @@ fun tableType() = Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), 
                     expanded = false
                     ApplicationState.selectedType = TableType.values()[selectedIndex]
 
-                }) {
-                    Text(text = s.stringName)
-                }
+                }) { Text(text = s.stringName) }
             }
         }
     }

@@ -34,7 +34,7 @@ class AuthScreen : ScreenInterface {
             }
 
             var password by remember { mutableStateOf("") }
-            input("Пароль", password) {
+            input("Пароль", password, true) {
                 ApplicationState.password = it
                 password = it
             }

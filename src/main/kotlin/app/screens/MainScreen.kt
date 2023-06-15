@@ -10,9 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.components.Alert
 import app.components.button
 import app.components.tableType
 import generator.generateTable
+import state.ApplicationState
+import utils.ScreenType
+import utils.TableType
 
 class MainScreen: ScreenInterface {
     @Composable
@@ -25,7 +29,42 @@ class MainScreen: ScreenInterface {
             tableType()
 
             button("Сгенерировать файл") {
-                generateTable()
+
+                if(ApplicationState.selectedType == TableType.NOT_SELECTED) {
+                    Alert.description = "Выберите таблицу"
+                    Alert.dismiss = "Понял"
+                } else {
+                    Alert.description =
+                        "Вы уверены что хотите сгенерировать таблицу \"${ApplicationState.selectedType?.stringName}\"?"
+
+                    Alert.dismiss = "Отменить"
+
+                    Alert.confirm = "Продолжить"
+
+                    Alert.onConfirm = {
+                        Alert.isShowDialog?.value = false
+                        generateTable()
+                    }
+                }
+
+                Alert.isShowDialog?.value = true
+
             }
+
+            button("Выйти") {
+
+                Alert.description = "Вы уверены что хотите выйти?"
+                Alert.dismiss = "Отмена"
+
+                Alert.confirm = "Продолжить"
+                Alert.onConfirm = {
+                    Alert.isShowDialog?.value = false
+                    ApplicationState.logout()
+                }
+
+                Alert.isShowDialog?.value = true
+
+            }
+
         }
 }

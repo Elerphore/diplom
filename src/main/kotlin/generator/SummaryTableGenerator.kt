@@ -7,14 +7,12 @@ import parser.utils.CellStyler
 import state.ApplicationState
 import utils.*
 import java.io.File
-import java.time.LocalDate
 import java.time.Month
 
-class DepartmentTableGenerator() : TableTypeInterface {
-
+class SummaryTableGenerator() : TableTypeInterface {
     override val fact: XSSFWorkbook = XSSFWorkbook()
     override var sheet: XSSFSheet? = null
-    override val excelFile = File("${System.getProperty("user.dir")}/out/department_table.xlsx")
+    override val excelFile: File = File("${System.getProperty("user.dir")}/out/summary.xlsx")
     override var lastRowTable: Int = 0
 
     private val students = ApplicationState.students
@@ -25,40 +23,28 @@ class DepartmentTableGenerator() : TableTypeInterface {
         CellStyler.init(fact)
 
         months.forEachIndexed { index, month ->
-
             currentMonth = month
+            if(sheet == null) sheet = fact.createSheet("Итог")
 
-            students.groupByDepart().forEach { (depName, stds) ->
-                if (sheet == null) sheet = fact.createSheet(depName)
+            val diff = index * (titles.size + 8)
+            dateTitle(diff, month.getRussianName())
+            base(diff)
 
-                val diff = index * (titles.size + 8)
-
-                dateTitle(diff, month.getRussianName())
-                departmentName(depName, diff)
-                base(diff)
-
-                codeSpec(stds, diff)
-            }
+            group(students, diff)
         }
+
         close()
+
     }
 
-    private fun codeSpec(stds: List<Student>, diff: Int) {
-
+    fun group(stds: List<Student>, diff: Int) {
         var previousGroupsAmount = 0
 
-        stds.groupByCodeSpec().forEach { (codeSpec, studscs) ->
+        stds.groupByCourser().forEach { course, studcourse ->
+            val studSpec = studcourse.groupByCodeSpec()
+            val currentGroupsAmount = studSpec.size
 
-            val studgrps = studscs.groupByGroups()
-
-            val currentGroupsAmount = studgrps.size
-
-            codeSpecName(
-                groupCount = currentGroupsAmount,
-                previousGroupCount = previousGroupsAmount,
-                csName = codeSpec,
-                diff
-            )
+            groupName(previousGroupCount = previousGroupsAmount, courseName = course, diff = diff)
 
             defineMergeRegion(
                 firstRow = diff + 2,
@@ -67,20 +53,30 @@ class DepartmentTableGenerator() : TableTypeInterface {
                 lastCol = ((previousGroupsAmount * 2) + (currentGroupsAmount * 2)) + 1,
             )
 
-            groups(studgrps, previousGroupsAmount, diff)
+            groups(studSpec, previousGroupsAmount, diff)
 
             previousGroupsAmount += currentGroupsAmount
+
         }
     }
 
-    private fun groups(studgrps: Map<String, List<Student>>, previousGroupsAmount: Int, diff: Int) {
+    fun groupName(previousGroupCount: Int, courseName: String, diff: Int) {
+        writeValueToCell(
+            row = diff + 2,
+            cell = (previousGroupCount * 2) + 2,
+            value = courseName
+        )
+    }
+
+    fun groups(studspec: Map<String, List<Student>>, previousGroupsAmount: Int, diff: Int) {
         var prevGRAmount = 0
-        studgrps.forEach { (groupName, studgrp) ->
+
+        studspec.forEach { (spec, stds) ->
 
             writeValueToCell(
                 diff + 3,
                 (prevGRAmount * 2) + (previousGroupsAmount * 2) + 2,
-                groupName
+                spec
             )
 
             writeValueToCell(
@@ -99,18 +95,18 @@ class DepartmentTableGenerator() : TableTypeInterface {
                 firstRow = diff + 3,
                 lastRow = diff + 3,
                 firstCol = (prevGRAmount * 2) + (previousGroupsAmount * 2) + 2,
-                lastCol = (prevGRAmount * 2) + ((previousGroupsAmount * 2)) + 3,
+                lastCol = (prevGRAmount * 2) + ((previousGroupsAmount * 2)) + 3
             )
 
             information(
-                studgrp.groupByOsnova()["Бюджетная"] ?: emptyList(),
+                stds.groupByOsnova()["Бюджетная"] ?: emptyList(),
                 false,
                 (previousGroupsAmount * 2) + (prevGRAmount * 2),
                 diff
             )
 
             information(
-                studgrp.groupByOsnova()["Коммерческая"] ?: emptyList(),
+                stds.groupByOsnova()["Коммерческая"] ?: emptyList(),
                 true,
                 (previousGroupsAmount * 2) + (prevGRAmount * 2),
                 diff
@@ -120,28 +116,29 @@ class DepartmentTableGenerator() : TableTypeInterface {
         }
     }
 
-    private fun departmentName(depName: String, diff: Int) = writeValueToCell(diff + 1, 0, depName)
+    private fun information(studgrp: List<Student>, osnova: Boolean, i: Int, di: Int) {
+        val diff = if (osnova) 1 else 0
 
-    private fun codeSpecName(groupCount: Int, previousGroupCount: Int, csName: String, diff: Int) {
-        writeValueToCell(
-            row = diff + 2,
-            cell = (previousGroupCount * 2) + 2,
-            value = csName
-        )
+        titles.forEachIndexed { index, s ->
+            val value = evaluateValue(s, studgrp)
+
+            writeValueToCell(di + (index + 5), i + 2 + diff, value.toString())
+        }
+
     }
 
     private fun evaluateValue(type: String, stds: List<Student>): Int =
         when (type) {
-            "Количество групп" -> 0
+            "Количество групп" -> stds.countGroups()
             "Кол-во несовершн.студент." -> stds.count { it.age < 18 }
             "Кол-во юношей" -> stds.count { it.Sex == "м" }
             "Число студентов на 1:" -> stds.firstOrNull()?.let { ApplicationState.orders.countAppliedOnFirstCourse(it.kodAgr, currentMonth!!) } ?: 0
-            "в том числе:" -> stds.count()
+            "в том числе:" -> 0
             "академический отпуск" -> 0
             "отпуск по уходу за ребенком" -> 0
-            "Прибыло всего человек:" -> stds.count()
             "призваны в ряды РА" -> 0
-            "в том числе:" -> 0
+            "Прибыло всего человек:" -> stds.count()
+            "в том числе:" -> stds.count()
             "зачислено на обучение" ->
                 stds.firstOrNull()?.let {
                     ApplicationState.orders.countAppliedOnPaidBase(it.kodAgr, currentMonth!!) +
@@ -163,15 +160,5 @@ class DepartmentTableGenerator() : TableTypeInterface {
             "выбыли по др. причинам" -> 0
             else -> 0
         }
-
-    private fun information(studgrp: List<Student>, osnova: Boolean, i: Int, dif: Int) {
-        val diff = if (osnova) 1 else 0
-
-        titles.forEachIndexed { index, s ->
-            val value = evaluateValue(s, studgrp)
-            writeValueToCell(dif + (index + 5), i + 2 + diff, value.toString())
-        }
-
-    }
 
 }

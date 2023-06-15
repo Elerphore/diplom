@@ -1,3 +1,6 @@
 import app.app
 
-fun main() = app()
+fun main(): Unit {
+    System.setProperty("skiko.renderApi", "OPENGL")
+    return app()
+}

@@ -9,16 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun input(label: String, value: String, onValueChange: (value: String) -> Unit, ) =
+fun input(label: String, value: String, isPasswordField: Boolean = false, onValueChange: (value: String) -> Unit, ) =
     Row(Modifier.fillMaxWidth(0.9F), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
 
         var expanded by remember { mutableStateOf(false) }
 
         TextField(
             label = { Text(label) },
+            visualTransformation = if(isPasswordField) PasswordVisualTransformation() else VisualTransformation.None,
             modifier = Modifier.fillMaxWidth().onFocusChanged { expanded = it.hasFocus },
             value = value,
             onValueChange = { onValueChange(it) },

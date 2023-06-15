@@ -1,52 +1,37 @@
 package state
 
-import com.microsoft.sqlserver.jdbc.SQLServerDataSource
 import data.Order
 import data.Student
-import java.sql.Connection
+import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.Statement
 
 object DatabaseSource {
-    private var serverName: String = System.getenv("serverName")
-    private var databaseName: String? = System.getenv("databaseName")
-    private var username: String = System.getenv("username")
-    private var password: String = System.getenv("password")
-    private var source: SQLServerDataSource? = null
-    private var connection: Connection? = null
     private var statement: Statement? = null
 
     init {
-        source = SQLServerDataSource()
 
-        source!!.sslProtocol = "TLSv1"
-        source!!.serverName = serverName
-        source!!.databaseName = databaseName
-        source!!.user = username
-        source!!.setPassword(password)
-
-        connection = source!!.connection
-
-        statement = connection!!.createStatement()
     }
 
+    fun init() = println("!!! DATASOURCE INITIALIZED")
+
     fun groupNames(): List<String> =
-        executeQuery("select distinct(NameGr) from vStuds") { res ->
+        executeQuery("select distinct(NameGr) from \"vStuds\"") { res ->
             res.getString("NameGr")
         }
 
     fun departNames(): List<String> =
-        executeQuery("select distinct(Depart) from vStuds") { res ->
+        executeQuery("select distinct(Depart) from \"vStuds\"") { res ->
             res.getString("Depart")
         }
 
     fun orderTypes(): List<String> =
-        executeQuery("select distinct(Name_Prikaz) from vStudPrikaz") { res ->
+        executeQuery("select distinct(Name_Prikaz) from \"vStudPrikaz\"") { res ->
             res.getString("Name_Prikaz")
         }
 
     fun orders(): List<Order> =
-        executeQuery("select Pers_Kod, Kod_aGr, Name_Prikaz, Nom_Prikaz, Date_Prikaz from vStudPrikaz") { result ->
+        executeQuery("select Pers_Kod, Kod_aGr, Name_Prikaz, Nom_Prikaz, Date_Prikaz from \"vStudPrikaz\"") { result ->
             Order(
                 persKod = result.getInt("Pers_Kod"),
                 kodaGr = result.getInt("Kod_aGr"),
@@ -57,7 +42,7 @@ object DatabaseSource {
         }
 
     fun students(): List<Student> =
-        executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from vStuds") { result ->
+        executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from \"vStuds\" where Depart = '${ApplicationState.department}'") { result ->
             Student(
                 persKod = result.getInt("Pers_Kod"),
                 kodAgr = result.getInt("Kod_aGr"),
@@ -76,7 +61,7 @@ object DatabaseSource {
         }
 
     fun studentsFromDepartment(department: String): List<Student> =
-        executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from vStuds where Depart = '$department'") { result ->
+        executeQuery("select Pers_Kod, Kod_aGr, Sex, osnova, codeSpec, Name_Spec, isActive, datePrikazFirst, Date_EndOb, Age, Depart, NameGr, Name_FormO from \"vStuds\" where Depart = '$department'") { result ->
             Student(
                 persKod = result.getInt("Pers_Kod"),
                 kodAgr = result.getInt("Kod_aGr"),

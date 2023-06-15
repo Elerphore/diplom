@@ -4,53 +4,51 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import parser.utils.CellStyler
 import state.DatabaseSource
+import utils.writeValueToCell
 import java.io.File
-import java.io.FileOutputStream
 
 class StudentTableGenerator : TableTypeInterface {
     override val fact: XSSFWorkbook = XSSFWorkbook()
     override val sheet: XSSFSheet = fact.createSheet()
-    override val styles = CellStyler(fact)
-    override val excelFile = File("${System.getProperty("user.dir")}/students.xlsx")
+    override val excelFile = File("${System.getProperty("user.dir")}/out/students.xlsx")
     override var lastRowTable: Int = 0
 
     override fun generate() {
-        sheet.createRow(0).createCell(0).setCellValue("Перс. код")
-        sheet.getRow(0).createCell(1).setCellValue("Код")
-        sheet.getRow(0).createCell(2).setCellValue("Пол")
-        sheet.getRow(0).createCell(3).setCellValue("Основа")
-        sheet.getRow(0).createCell(4).setCellValue("Специальность")
-        sheet.getRow(0).createCell(5).setCellValue("Имя специальности")
-        sheet.getRow(0).createCell(6).setCellValue("Активный")
-        sheet.getRow(0).createCell(7).setCellValue("Дата приказа")
-        sheet.getRow(0).createCell(8).setCellValue("Дата окончания")
-        sheet.getRow(0).createCell(9).setCellValue("Возраст")
-        sheet.getRow(0).createCell(10).setCellValue("Департамент")
-        sheet.getRow(0).createCell(11).setCellValue("Имя группы")
-        sheet.getRow(0).createCell(12).setCellValue("Имя формы")
+        CellStyler.init(fact)
+
+        writeValueToCell(0, 0, "Перс. код")
+        writeValueToCell(0, 1, "Код")
+        writeValueToCell(0, 2, "Пол")
+        writeValueToCell(0, 3, "Основа")
+        writeValueToCell(0, 4, "Специальность")
+        writeValueToCell(0, 5, "Имя специальности")
+        writeValueToCell(0, 6, "Активный")
+        writeValueToCell(0, 7, "Возраст")
+        writeValueToCell(0, 8, "Дата Начала")
+        writeValueToCell(0, 9, "Дата окончания")
+        writeValueToCell(0, 10, "Департамент")
+        writeValueToCell(0, 11, "Имя группы")
+        writeValueToCell(0, 12, "Имя формы")
 
         val students = DatabaseSource.students()
 
         students.forEachIndexed { i, student ->
             val index = i + 1
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(0).setCellValue(student.persKod.toString())
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(1).setCellValue(student.kodAgr.toString())
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(2).setCellValue(student.Sex)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(3).setCellValue(student.osnova)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(4).setCellValue(student.codeSpec)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(5).setCellValue(student.nameSpec)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(6).setCellValue(student.isActive)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(7).setCellValue(student.age.toString())
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(8).setCellValue(student.depart)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(9).setCellValue(student.nameGr)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(10).setCellValue(student.nameFormO)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(11).setCellValue(student.datePrikazFirst)
-            (sheet.getRow(index) ?: sheet.createRow(index)).createCell(12).setCellValue(student.dateEndOb)
+            writeValueToCell(index, 0, student.persKod.toString())
+            writeValueToCell(index, 1, student.kodAgr.toString())
+            writeValueToCell(index, 2, student.Sex.toString())
+            writeValueToCell(index, 3, student.osnova)
+            writeValueToCell(index, 4, student.codeSpec)
+            writeValueToCell(index, 5, student.nameSpec)
+            writeValueToCell(index, 6, student.isActive.toString())
+            writeValueToCell(index, 7, student.age.toString())
+            writeValueToCell(index, 8, student.datePrikazFirst.toString())
+            writeValueToCell(index, 9, student.dateEndOb.toString())
+            writeValueToCell(index, 10, student.depart)
+            writeValueToCell(index, 11, student.nameGr)
+            writeValueToCell(index, 12, student.nameFormO)
         }
 
-        with(FileOutputStream(excelFile)) {
-            fact.write(this)
-            close()
-        }
+        close()
     }
 }
